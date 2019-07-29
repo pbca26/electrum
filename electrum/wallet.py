@@ -148,7 +148,7 @@ def sweep(privkeys, network: 'Network', config: 'SimpleConfig', recipient, fee=N
         locktime = get_locktime_for_new_transaction(network)
 
     tx = Transaction.from_io(inputs, outputs, locktime=locktime, version=tx_version)
-    tx.set_rbf(True)
+    tx.set_rbf(False)
     tx.sign(keypairs)
     return tx
 
@@ -809,7 +809,7 @@ class Abstract_Wallet(AddressSynchronizer):
              domain=None, rbf=False, nonlocal_only=False, *, tx_version=None):
         coins = self.get_spendable_coins(domain, config, nonlocal_only=nonlocal_only)
         tx = self.make_unsigned_transaction(coins, outputs, config, fee, change_addr)
-        tx.set_rbf(rbf)
+        #tx.set_rbf(rbf)
         if tx_version is not None:
             tx.version = tx_version
         self.sign_transaction(tx, password)

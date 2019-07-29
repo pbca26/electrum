@@ -133,7 +133,7 @@ class TxDialog(Factory.Popup):
         self.status_str = tx_details.status
         self.description = tx_details.label
         self.can_broadcast = tx_details.can_broadcast
-        self.can_rbf = tx_details.can_bump
+        self.can_rbf = False #tx_details.can_bump
         self.tx_hash = tx_details.txid or ''
         if tx_mined_status.timestamp:
             self.date_label = _('Date')
