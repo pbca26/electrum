@@ -234,6 +234,7 @@ class Abstract_Wallet(AddressSynchronizer):
         self.contacts = Contacts(self.storage)
 
         self._coin_price_cache = {}
+        self.syncronizedPerc = 0
 
     def stop_threads(self):
         super().stop_threads()

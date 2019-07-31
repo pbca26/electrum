@@ -75,6 +75,10 @@ class SPV(NetworkJobOnDefaultServer):
     async def _request_proofs(self):
         local_height = self.blockchain.height()
         unverified = self.wallet.get_unverified_txs()
+        interface = self.network.interface
+
+        if local_height > 0 and interface.tip > 0:
+            self.wallet.syncronizedPerc = (local_height * 100) / interface.tip
 
         for tx_hash, tx_height in unverified.items():
             # do not request merkle branch if we already requested it

@@ -840,6 +840,10 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
                 if self.fx.is_enabled():
                     text += self.fx.get_fiat_status_text(c + u + x,
                         self.base_unit(), self.get_decimal_point()) or ''
+
+                if self.wallet.syncronizedPerc > 0 and self.wallet.syncronizedPerc < 100:
+                    text += _(" |  Synced" ) + ": %.2f "%(self.wallet.syncronizedPerc) + "%"
+
                 if not self.network.proxy:
                     icon = read_QIcon("status_connected%s.png"%fork_str)
                 else:

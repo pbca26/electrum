@@ -387,7 +387,6 @@ class Zaif(ExchangeBase):
 class AtomicExplorer(ExchangeBase):
     async def get_rates(self, ccy):
         json = await self.get_json('atomicexplorer.com', '/api/mm/prices/v2?coins=chips&currency=' + ccy)
-        print(json)
         chips_ticker = json.get('result').get('CHIPS').get(ccy)
         result = {ccy: chips_ticker}
         return result
