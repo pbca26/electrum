@@ -22,8 +22,8 @@ from .logging import Logger
 
 
 DEFAULT_ENABLED = False
-DEFAULT_CURRENCY = "EUR"
-DEFAULT_EXCHANGE = "CoinGecko"  # default exchange should ideally provide historical rates
+DEFAULT_CURRENCY = "USD"
+DEFAULT_EXCHANGE = "AtomicExplorer"  # default exchange should ideally provide historical rates
 
 
 # See https://en.wikipedia.org/wiki/ISO_4217
@@ -384,6 +384,13 @@ class Zaif(ExchangeBase):
         json = await self.get_json('api.zaif.jp', '/api/1/last_price/btc_jpy')
         return {'JPY': Decimal(json['last_price'])}
 
+class AtomicExplorer(ExchangeBase):
+    async def get_rates(self, ccy):
+        json = await self.get_json('atomicexplorer.com', '/api/mm/prices/v2?coins=chips&currency=' + ccy)
+        print(json)
+        chips_ticker = json.get('result').get('CHIPS').get(ccy)
+        result = {ccy: chips_ticker}
+        return result
 
 def dictinvert(d):
     inv = {}
