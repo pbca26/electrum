@@ -235,6 +235,31 @@ def script_num_to_hex(i: int) -> str:
     return bh2u(result)
 
 
+def sha256_bytes_str(x):
+    x = to_bytes(x, 'utf8')
+    return hashlib.sha256(x).digest()
+
+
+def agama_seed_to_wif(seed):
+    bytes = list(sha256_bytes_str(seed))
+
+    # 3 bytes flip
+    bytes[0] &= 248
+    bytes[31] &= 127
+    bytes[31] |= 64
+
+    base58_wif = serialize_privkey_agama(bytearray(bytes))
+    return base58_wif
+
+
+def serialize_privkey_agama(secret):
+    prefix = bytes([constants.net.WIF_PREFIX])
+    suffix = b'\01' # compressed
+    vchIn = prefix + secret + suffix
+    base58_wif = EncodeBase58Check(vchIn)
+
+    return base58_wif
+
 def var_int(i: int) -> str:
     # https://en.bitcoin.it/wiki/Protocol_specification#Variable_length_integer
     if i<0xfd:
