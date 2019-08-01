@@ -22,10 +22,10 @@ FEE_DEPTH_TARGETS = [10000000, 5000000, 2000000, 1000000, 500000, 200000, 100000
 # satoshi per kbyte
 FEERATE_MAX_DYNAMIC = 1500000
 FEERATE_WARNING_HIGH_FEE = 600000
-FEERATE_FALLBACK_STATIC_FEE = 150000
+FEERATE_FALLBACK_STATIC_FEE = 10000
 FEERATE_DEFAULT_RELAY = 1000
-FEERATE_STATIC_VALUES = [1000, 2000, 5000, 10000, 20000, 30000,
-                         50000, 70000, 100000, 150000, 200000, 300000]
+FEERATE_STATIC_VALUES = [10000]
+STATIC_FEE = 10000
 
 
 config = None
@@ -207,7 +207,7 @@ class SimpleConfig(Logger):
         base_unit = self.user_config.get('base_unit')
         if isinstance(base_unit, str):
             self._set_key_in_user_config('base_unit', None)
-            map_ = {'btc':8, 'mbtc':5, 'ubtc':2, 'bits':2, 'sat':0}
+            map_ = {'CHIPS':8, 'mCHIPS':5, 'uCHIPS':2, 'bits':2, 'sat':0}
             decimal_point = map_.get(base_unit.lower())
             self._set_key_in_user_config('decimal_point', decimal_point)
 
@@ -483,7 +483,8 @@ class SimpleConfig(Logger):
             return self.has_fee_etas()
 
     def is_dynfee(self):
-        return bool(self.get('dynamic_fees', True))
+        return False
+        #return bool(self.get('dynamic_fees', True))
 
     def use_mempool_fees(self):
         return bool(self.get('mempool_fees', False))
@@ -537,7 +538,8 @@ class SimpleConfig(Logger):
         fee_per_kb = self.fee_per_kb()
         if fee_per_kb is None:
             raise NoDynamicFeeEstimates()
-        return self.estimate_fee_for_feerate(fee_per_kb, size)
+        return STATIC_FEE
+        #return self.estimate_fee_for_feerate(fee_per_kb, size)
 
     @classmethod
     def estimate_fee_for_feerate(cls, fee_per_kb: Union[int, float, Decimal],

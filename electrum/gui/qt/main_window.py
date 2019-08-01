@@ -446,7 +446,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
             self.setGeometry(100, 100, 840, 400)
 
     def watching_only_changed(self):
-        name = "Electrum Testnet" if constants.net.TESTNET else "Electrum"
+        name = "Electrum Testnet" if constants.net.TESTNET else "Electrum CHIPS"
         title = '%s %s  -  %s' % (name, ELECTRUM_VERSION,
                                         self.wallet.basename())
         extra = [self.wallet.storage.get('wallet_type', '?')]
@@ -840,6 +840,10 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
                 if self.fx.is_enabled():
                     text += self.fx.get_fiat_status_text(c + u + x,
                         self.base_unit(), self.get_decimal_point()) or ''
+
+                if self.wallet.syncronizedPerc > 0 and self.wallet.syncronizedPerc < 100:
+                    text += _(" |  Synced" ) + ": %.2f "%(self.wallet.syncronizedPerc) + "%"
+
                 if not self.network.proxy:
                     icon = read_QIcon("status_connected%s.png"%fork_str)
                 else:
@@ -1665,7 +1669,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
         amount = tx.output_value() if self.max_button.isChecked() else sum(map(lambda x:x[2], outputs))
         fee = tx.get_fee()
 
-        use_rbf = self.config.get('use_rbf', True)
+        use_rbf = self.config.get('use_rbf', False)
         if use_rbf:
             tx.set_rbf(True)
 
@@ -2884,7 +2888,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
         feebox_cb.stateChanged.connect(on_feebox)
         fee_widgets.append((feebox_cb, None))
 
-        use_rbf = self.config.get('use_rbf', True)
+        use_rbf = self.config.get('use_rbf', False)
         use_rbf_cb = QCheckBox(_('Use Replace-By-Fee'))
         use_rbf_cb.setChecked(use_rbf)
         use_rbf_cb.setToolTip(
@@ -3211,11 +3215,11 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
         fiat_widgets.append((QLabel(_('Source')), ex_combo))
 
         tabs_info = [
-            (fee_widgets, _('Fees')),
+            #(fee_widgets, _('Fees')),
             (tx_widgets, _('Transactions')),
             (gui_widgets, _('General')),
             (fiat_widgets, _('Fiat')),
-            (id_widgets, _('Identity')),
+            #(id_widgets, _('Identity')),
         ]
         for widgets, name in tabs_info:
             tab = QWidget()

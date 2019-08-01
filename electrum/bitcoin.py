@@ -235,6 +235,31 @@ def script_num_to_hex(i: int) -> str:
     return bh2u(result)
 
 
+def sha256_bytes_str(x):
+    x = to_bytes(x, 'utf8')
+    return hashlib.sha256(x).digest()
+
+
+def agama_seed_to_wif(seed):
+    bytes = list(sha256_bytes_str(seed))
+
+    # 3 bytes flip
+    bytes[0] &= 248
+    bytes[31] &= 127
+    bytes[31] |= 64
+
+    base58_wif = serialize_privkey_agama(bytearray(bytes))
+    return base58_wif
+
+
+def serialize_privkey_agama(secret):
+    prefix = bytes([constants.net.WIF_PREFIX])
+    suffix = b'\01' # compressed
+    vchIn = prefix + secret + suffix
+    base58_wif = EncodeBase58Check(vchIn)
+
+    return base58_wif
+
 def var_int(i: int) -> str:
     # https://en.bitcoin.it/wiki/Protocol_specification#Variable_length_integer
     if i<0xfd:
@@ -390,7 +415,7 @@ def script_to_address(script: str, *, net=None) -> str:
 def address_to_script(addr: str, *, net=None) -> str:
     if net is None: net = constants.net
     if not is_address(addr, net=net):
-        raise BitcoinException(f"invalid bitcoin address: {addr}")
+        raise BitcoinException(f"invalid CHIPS address: {addr}")
     witver, witprog = segwit_addr.decode(net.SEGWIT_HRP, addr)
     if witprog is not None:
         if not (0 <= witver <= 16):

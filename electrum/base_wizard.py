@@ -131,7 +131,8 @@ class BaseWizard(Logger):
             ('standard',  _("Standard wallet")),
             ('2fa', _("Wallet with two-factor authentication")),
             ('multisig',  _("Multi-signature wallet")),
-            ('imported',  _("Import Bitcoin addresses or private keys")),
+            ('imported',  _("Import CHIPS addresses or private keys")),
+            ('agama',  _("Import Agama/BarderDEX seed"))
         ]
         choices = [pair for pair in wallet_kinds if pair[0] in wallet_types]
         self.choice_dialog(title=title, message=message, choices=choices, run_next=self.on_wallet_type)
@@ -167,6 +168,8 @@ class BaseWizard(Logger):
             action = self.plugin.get_action(self.data)
         elif choice == 'imported':
             action = 'import_addresses_or_keys'
+        elif choice == 'agama':
+            action = 'import_agama_seed'
         self.run(action)
 
     def choose_multisig(self):
@@ -188,25 +191,32 @@ class BaseWizard(Logger):
                 ('restore_from_seed', _('I already have a seed')),
                 ('restore_from_key', _('Use a master key')),
             ]
-            if not self.is_kivy:
-                choices.append(('choose_hw_device',  _('Use a hardware device')))
+            #if not self.is_kivy:
+            #    choices.append(('choose_hw_device',  _('Use a hardware device')))
         else:
             message = _('Add a cosigner to your multi-sig wallet')
             choices = [
                 ('restore_from_key', _('Enter cosigner key')),
                 ('restore_from_seed', _('Enter cosigner seed')),
             ]
-            if not self.is_kivy:
-                choices.append(('choose_hw_device',  _('Cosign with hardware device')))
+            #if not self.is_kivy:
+            #    choices.append(('choose_hw_device',  _('Cosign with hardware device')))
 
         self.choice_dialog(title=title, message=message, choices=choices, run_next=self.run)
 
     def import_addresses_or_keys(self):
         v = lambda x: keystore.is_address_list(x) or keystore.is_private_key_list(x, raise_on_error=True)
-        title = _("Import Bitcoin Addresses")
-        message = _("Enter a list of Bitcoin addresses (this will create a watching-only wallet), or a list of private keys.")
+        title = _("Import CHIPS Addresses")
+        message = _("Enter a list of CHIPS addresses (this will create a watching-only wallet), or a list of private keys.")
         self.add_xpub_dialog(title=title, message=message, run_next=self.on_import,
                              is_valid=v, allow_multi=True, show_wif_help=True)
+
+    def import_agama_seed(self):
+        v = lambda x: keystore.is_seed_list(x)
+        title = _("Import Agama/BarderDEX Seed")
+        message = _("Enter an Agama or BarterDEX seed")
+        self.add_xpub_dialog(title=title, message=message, run_next=self.on_import,
+                             is_valid=v, allow_multi=True)
 
     def on_import(self, text):
         # text is already sanitized by is_address_list and is_private_keys_list
@@ -215,6 +225,23 @@ class BaseWizard(Logger):
             for addr in text.split():
                 assert bitcoin.is_address(addr)
                 self.data['addresses'][addr] = {}
+        elif keystore.is_seed_list(text):
+            #k = keystore.Imported_KeyStore({})
+            #w = Imported_Wallet(self.storage)
+            #for pk in keystore.get_private_keys_from_agama_seed(text):
+            #    w.import_privkey(pk, None)
+            #self.keystores.append(w.keystore)
+
+            self.data['addresses'] = {}
+            k = keystore.Imported_KeyStore({})
+            keys = keystore.get_private_keys_from_agama_seed(text)
+            for pk in keys:
+                assert bitcoin.is_private_key(pk)
+                txin_type, pubkey = k.import_privkey(pk, None)
+                addr = bitcoin.pubkey_to_address(txin_type, pubkey)
+                self.data['addresses'][addr] = {'type':txin_type, 'pubkey':pubkey, 'redeem_script':None}
+            self.keystores.append(k)
+
         elif keystore.is_private_key_list(text):
             self.data['addresses'] = {}
             k = keystore.Imported_KeyStore({})
@@ -566,6 +593,10 @@ class BaseWizard(Logger):
             for i, k in enumerate(self.keystores):
                 self.data['x%d/'%(i+1)] = k.dump()
         elif self.wallet_type == 'imported':
+            if len(self.keystores) > 0:
+                keys = self.keystores[0].dump()
+                self.data['keystore'] = keys
+        elif self.wallet_type == 'agama':
             if len(self.keystores) > 0:
                 keys = self.keystores[0].dump()
                 self.data['keystore'] = keys
