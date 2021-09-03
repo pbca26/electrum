@@ -12,7 +12,7 @@
   1) Derive receive address (receive) - pass
   2) Transaction signing (send) - pass
 
-Only Native segwit addresses are working out of the box. p2pkh and p2wpkh-p2sh require a firmware fixes.
+Only Native segwit addresses are working out of the box. p2pkh and p2wpkh-p2sh require firmware fixes.
 
 <b>*</b> Address derivation is working but it shows a BTC address on device screen. It will require a fork of BTC app for Ledger with CHIPS specific address bits changes baked into it. Same goes for Trezor, changes on firmware level are required in order for users to see KMD like addresses on the screen.
 
