@@ -310,6 +310,8 @@ class Abstract_Wallet(AddressSynchronizer, ABC):
 
         self.lnworker = None
 
+        self.syncronizedPerc = 0
+
     def save_db(self):
         if self.storage:
             self.db.write(self.storage)

@@ -976,6 +976,8 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
                     text +=  " [%s unconfirmed]"%(self.format_amount(u, is_diff=True).strip())
                 if x:
                     text +=  " [%s unmatured]"%(self.format_amount(x, is_diff=True).strip())
+                if self.wallet.syncronizedPerc > 0 and self.wallet.syncronizedPerc < 100:
+                                    text += _(" |  Synced" ) + ": %.2f "%(self.wallet.syncronizedPerc) + "%"
                 if self.wallet.has_lightning():
                     l = self.wallet.lnworker.get_balance()
                     text += u'    \U000026a1 %s'%(self.format_amount_and_units(l).strip())
