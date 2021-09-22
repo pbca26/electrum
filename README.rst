@@ -163,3 +163,7 @@ with the web client, `web.libera.chat`_.
 
 .. _web.libera.chat: https://web.libera.chat/#electrum
 .. _GitHub: https://github.com/spesmilo/electrum
+
+AuxPow support
+-------
+https://github.com/namecoin/electrum-nmc/commits/auxpow?after=840cdc07988c232a1d988bfceecdb815af25aad3+34&branch=auxpow
