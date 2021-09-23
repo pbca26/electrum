@@ -27,7 +27,7 @@ FEE_LN_ETA_TARGET = 2  # note: make sure the network is asking for estimates for
 # satoshi per kbyte
 FEERATE_MAX_DYNAMIC = 1500000
 FEERATE_WARNING_HIGH_FEE = 600000
-FEERATE_FALLBACK_STATIC_FEE = 150000
+FEERATE_FALLBACK_STATIC_FEE = 10000
 FEERATE_DEFAULT_RELAY = 1000
 FEERATE_MAX_RELAY = 50000
 FEERATE_STATIC_VALUES = [1000, 2000, 5000, 10000, 20000, 30000,
@@ -540,7 +540,8 @@ class SimpleConfig(Logger):
             return self.has_fee_etas()
 
     def is_dynfee(self):
-        return bool(self.get('dynamic_fees', True))
+        return False
+        #return bool(self.get('dynamic_fees', True))
 
     def use_mempool_fees(self):
         return bool(self.get('mempool_fees', False))
@@ -596,13 +597,14 @@ class SimpleConfig(Logger):
 
     def estimate_fee(self, size: Union[int, float, Decimal], *,
                      allow_fallback_to_static_rates: bool = False) -> int:
-        fee_per_kb = self.fee_per_kb()
-        if fee_per_kb is None:
-            if allow_fallback_to_static_rates:
-                fee_per_kb = FEERATE_FALLBACK_STATIC_FEE
-            else:
-                raise NoDynamicFeeEstimates()
-        return self.estimate_fee_for_feerate(fee_per_kb, size)
+        return FEERATE_FALLBACK_STATIC_FEE
+        #fee_per_kb = self.fee_per_kb()
+        #if fee_per_kb is None:
+        #    if allow_fallback_to_static_rates:
+        #        fee_per_kb = FEERATE_FALLBACK_STATIC_FEE
+        #    else:
+        #        raise NoDynamicFeeEstimates()
+        #return self.estimate_fee_for_feerate(fee_per_kb, size)
 
     @classmethod
     def estimate_fee_for_feerate(cls, fee_per_kb: Union[int, float, Decimal],
