@@ -167,3 +167,16 @@ with the web client, `web.libera.chat`_.
 AuxPow support
 -------
 https://github.com/namecoin/electrum-nmc/commits/auxpow?after=840cdc07988c232a1d988bfceecdb815af25aad3+34&branch=auxpow
+
+
+HW wallet integration results
+-------
+(1) Legacy address - pass, no issues, both send and receive
+(2) P2SH Segwit - fail, receive is working but an attempt to send a transaction yields the following error 'the transaction was rejected by network rules.\n\n64: no-witness-yet\n[0200000000010128a6e071b524e2af67ae3d91af5d7997427a2867b0547a05e25923b710c70c35010000001716001491387df0268e77a84928e2700875dd74d2d81690fdffffff02102700000000000017a914394c53a52f512b5af0d3b144e891973f51766ad487102700000000000017a914da971ee07682b57315ad30ab1becfeb8125da1c38702483045022100c2e217c49de620502e4f7f3effea89b8fe69d8f5234f3712f48687ab473eafe802206d73bb49f8f4a1706c27e97947a507561c79b1fb7ba0bfa49e9aed55369d2ff70121020eb18e95fd3bf6b4f6a61623277a02a1a16b3f841e26f7cf41cb79af3ca24e01c5090300'
+Quick search in Google points to a possible witness not enabled on-chain yet
+https://www.google.com/search?q=error+no-witness-yet&oq=error+no-witness-yet&aqs=chrome..69i57j33i160.2894j0j7&sourceid=chrome&ie=UTF-8
+After closely looking at SFUSD code there's no Segwit height or timestamp activation set in https://github.com/pbcllc/sfusd-core/blob/master/src/chainparams.cpp#L161
+e.g. https://github.com/bitcoin/bitcoin/blob/master/src/chainparams.cpp#L74
+(3) Native Segwit - not tested due to missing on-chain witness activation params
+
+Note: addresses displayed on HW device screen are different than what a user sees in GUI. Change in HW vendor firmware are required in order to properly derive and display correct addresses on device screen. Otherwise users will be unable to verify what are they signing.
